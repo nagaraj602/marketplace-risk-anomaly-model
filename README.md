@@ -31,7 +31,7 @@ Before setting up the ML Anomaly Model service, verify the following prerequisit
 - **Python 3.15.2+**: Runtimes and headers (`python3 --version`)
 - **Python venv & pip**: Standard virtual environment and package tools (`python3 -m pip --version`)
 - **Docker Engine 24.0+**: (Optional for local script execution; required for containerized builds)
-- **Port Availability**: Port `5000` available on localhost
+- **Port Availability**: Port `8282` available on localhost
 
 ---
 
@@ -49,14 +49,14 @@ pip install -r requirements.txt
 # 3. Run automated tests
 python3 -m unittest discover tests
 
-# 4. Start API server on port 5000
+# 4. Start API server on port 8282
 python3 app.py
 ```
 
 ### Docker Execution
 ```bash
 docker build -t marketplace-risk-anomaly-model:latest .
-docker run -p 5000:5000 marketplace-risk-anomaly-model:latest
+docker run -p 8282:8282 marketplace-risk-anomaly-model:latest
 ```
 
 ---
@@ -65,12 +65,12 @@ docker run -p 5000:5000 marketplace-risk-anomaly-model:latest
 
 ### 1. Health Probe
 ```bash
-curl http://localhost:5000/health
+curl http://localhost:8282/health
 ```
 
 ### 2. Anomaly Scoring Inference (`/score`)
 ```bash
-curl -X POST http://localhost:5000/score \
+curl -X POST http://localhost:8282/score \
   -H "Content-Type: application/json" \
   -d '{
     "seller_id": "seller_test_99",
@@ -86,8 +86,8 @@ curl -X POST http://localhost:5000/score \
 ### 3. Failover / Chaos Testing (`/admin/toggle-health`)
 Simulates an ML pod outage to test backend circuit-breaker fallback:
 ```bash
-curl -X POST http://localhost:5000/admin/toggle-health
+curl -X POST http://localhost:8282/admin/toggle-health
 ```
 
 ### 4. Interactive API Documentation (Swagger)
-Open [http://localhost:5000/docs](http://localhost:5000/docs) in your browser.
+Open [http://localhost:8282/docs](http://localhost:8282/docs) in your browser.

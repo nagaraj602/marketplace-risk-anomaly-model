@@ -22,7 +22,7 @@ app = FastAPI(
     version="2.0.0"
 )
 
-MODEL_PORT = int(os.getenv("MODEL_PORT", "5000"))
+MODEL_PORT = int(os.getenv("MODEL_PORT", "8282"))
 model_healthy = True
 
 # Synthetic baseline data to prime the IsolationForest estimator

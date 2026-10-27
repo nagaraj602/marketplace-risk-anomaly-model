@@ -26,13 +26,13 @@ COPY --chown=appuser:appgroup app.py .
 
 ENV PATH=/home/appuser/.local/bin:$PATH \
     PYTHONUNBUFFERED=1 \
-    MODEL_PORT=5000
+    MODEL_PORT=8282
 
 USER appuser
 
-EXPOSE 5000
+EXPOSE 8282
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-    CMD python3 -c "import urllib.request; urllib.request.urlopen('http://localhost:5000/health')" || exit 1
+    CMD python3 -c "import urllib.request; urllib.request.urlopen('http://localhost:8282/health')" || exit 1
 
-ENTRYPOINT ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "5000"]
+ENTRYPOINT ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8282"]
