@@ -1,0 +1,40 @@
+model:
+  name: marketplace-risk-anomaly-model
+  replicaCount: 2
+  image:
+    repository: __MODEL_IMAGE_REPOSITORY__
+    tag: __MODEL_IMAGE_TAG__
+    pullPolicy: Always
+  env:
+    MODEL_PORT: "5000"
+    WORKERS: "4"
+    LOG_LEVEL: "info"
+  service:
+    type: ClusterIP
+    port: 5000
+    targetPort: 5000
+  resources:
+    requests:
+      cpu: 250m
+      memory: 256Mi
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+  probes:
+    liveness:
+      path: /health
+      port: 5000
+      initialDelaySeconds: 15
+      periodSeconds: 10
+      timeoutSeconds: 3
+    readiness:
+      path: /health
+      port: 5000
+      initialDelaySeconds: 10
+      periodSeconds: 5
+      timeoutSeconds: 2
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 8
+    targetCPUUtilizationPercentage: 75

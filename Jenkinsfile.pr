@@ -1,0 +1,50 @@
+@Library('sharedlibrary')_
+
+pipeline {
+    agent {
+        label 'agent'
+    }
+    environment {
+        imageName = "marketplace-risk-anomaly-model-pr"
+        dockerTag = "${env.BUILD_NUMBER}"
+        gitRepoURL = "https://github.com/nagaraj602/marketplace-risk-anomaly-model.git"
+    }
+    stages {
+        stage('Git Checkout') {
+            steps {
+                gitCheckout(env.gitRepoURL, env.BRANCH_NAME, "githubCred")
+            }
+        }
+
+        stage('Unit Tests') {
+            steps {
+                sh '''
+                    python3 -m venv venv || true
+                    . venv/bin/activate || true
+                    pip install -q -r requirements.txt
+                    python3 -m unittest discover tests
+                '''
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                sonarAnalysis('marketplace-risk-anomaly-model', 'marketplace-risk-anomaly-model', 'sonar-server', 'sonarToken')
+            }
+        }
+
+        stage('Docker Build') {
+            steps {
+                dockerImageBuild(env.imageName, env.dockerTag, 'Dockerfile')
+            }
+        }
+
+        stage('Trivy Security Scans') {
+            steps {
+                trivyScan('fs', '.', 'HIGH,CRITICAL', 0)
+                trivyScan('config', 'Dockerfile', 'HIGH,CRITICAL', 0)
+                trivyScan('image', "${env.imageName}:${env.dockerTag}", 'HIGH,CRITICAL', 0, "model-trivy-report-${env.BUILD_NUMBER}.json")
+            }
+        }
+    }
+}

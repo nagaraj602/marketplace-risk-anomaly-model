@@ -1,0 +1,16 @@
+apiVersion: v2
+name: marketplace-risk-anomaly-model
+description: Real-time Anomaly Scoring Machine Learning Service for Marketplace Risk Detection
+type: application
+version: 1.0.0
+appVersion: 2.0.0
+maintainers:
+  - name: Nagaraj
+    email: nagarajkamath602@outlook.com
+keywords:
+  - marketplace
+  - risk-detection
+  - machine-learning
+  - anomaly-detection
+  - python
+  - fastapi

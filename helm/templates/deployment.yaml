@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.model.name }}
+  labels:
+    app: {{ .Values.model.name }}
+spec:
+  {{- if not .Values.model.autoscaling.enabled }}
+  replicas: {{ .Values.model.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app: {{ .Values.model.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.model.name }}
+    spec:
+      containers:
+        - name: {{ .Values.model.name }}
+          image: "{{ .Values.model.image.repository }}:{{ .Values.model.image.tag }}"
+          imagePullPolicy: {{ .Values.model.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.model.service.targetPort }}
+              name: http
+          env:
+            - name: MODEL_PORT
+              value: "{{ .Values.model.env.MODEL_PORT }}"
+            - name: WORKERS
+              value: "{{ .Values.model.env.WORKERS }}"
+          resources:
+            {{- toYaml .Values.model.resources | nindent 12 }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.model.probes.liveness.path }}
+              port: {{ .Values.model.probes.liveness.port }}
+            initialDelaySeconds: {{ .Values.model.probes.liveness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.model.probes.liveness.periodSeconds }}
+            timeoutSeconds: {{ .Values.model.probes.liveness.timeoutSeconds }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.model.probes.readiness.path }}
+              port: {{ .Values.model.probes.readiness.port }}
+            initialDelaySeconds: {{ .Values.model.probes.readiness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.model.probes.readiness.periodSeconds }}
+            timeoutSeconds: {{ .Values.model.probes.readiness.timeoutSeconds }}
