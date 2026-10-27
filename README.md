@@ -25,6 +25,16 @@ Real-time statistical and machine learning anomaly detection engine for the **Ma
 
 ---
 
+## ⚙️ Prerequisites
+
+Before setting up the ML Anomaly Model service, verify the following prerequisites:
+- **Python 3.15.2+**: Runtimes and headers (`python3 --version`)
+- **Python venv & pip**: Standard virtual environment and package tools (`python3 -m pip --version`)
+- **Docker Engine 24.0+**: (Optional for local script execution; required for containerized builds)
+- **Port Availability**: Port `5000` available on localhost
+
+---
+
 ## 🛠️ How to Setup & Run
 
 ### Local Execution
