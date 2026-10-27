@@ -4,7 +4,7 @@ Anomaly Scoring Service (ML & Statistical Profiler)
 """
 
 from fastapi import FastAPI, HTTPException, status
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, AliasChoices
 from typing import List, Optional, Dict, Any
 import numpy as np
 from sklearn.ensemble import IsolationForest
@@ -46,27 +46,34 @@ logger.info("IsolationForest model successfully trained on baseline seller behav
 
 
 class SellerSignalPayload(BaseModel):
-    seller_id: str = Field(..., example="seller_847291")
-    account_age_days: int = Field(default=30, ge=0)
-    listings_last_hour: int = Field(default=0, ge=0)
-    orders_last_hour: int = Field(default=0, ge=0)
-    positive_reviews_ratio: float = Field(default=0.90, ge=0.0, le=1.0)
-    unique_devices_count: int = Field(default=1, ge=1)
-    distinct_ip_count: int = Field(default=1, ge=1)
-    avg_listing_price_usd: float = Field(default=50.0, ge=0.0)
-    payout_account_changed_recently: bool = Field(default=False)
-    geo_mismatch_country: bool = Field(default=False)
+    seller_id: str = Field(..., validation_alias=AliasChoices("seller_id", "sellerId"), example="seller_847291")
+    account_age_days: int = Field(default=30, ge=0, validation_alias=AliasChoices("account_age_days", "accountAgeDays"))
+    listings_last_hour: int = Field(default=0, ge=0, validation_alias=AliasChoices("listings_last_hour", "listingsLastHour"))
+    orders_last_hour: int = Field(default=0, ge=0, validation_alias=AliasChoices("orders_last_hour", "ordersLastHour"))
+    positive_reviews_ratio: float = Field(default=0.90, ge=0.0, le=1.0, validation_alias=AliasChoices("positive_reviews_ratio", "positiveReviewsRatio"))
+    unique_devices_count: int = Field(default=1, ge=1, validation_alias=AliasChoices("unique_devices_count", "uniqueDevicesCount"))
+    distinct_ip_count: int = Field(default=1, ge=1, validation_alias=AliasChoices("distinct_ip_count", "distinctIpCount"))
+    avg_listing_price_usd: float = Field(default=50.0, ge=0.0, validation_alias=AliasChoices("avg_listing_price_usd", "avgListingPriceUsd"))
+    payout_account_changed_recently: bool = Field(default=False, validation_alias=AliasChoices("payout_account_changed_recently", "payoutAccountChangedRecently"))
+    geo_mismatch_country: bool = Field(default=False, validation_alias=AliasChoices("geo_mismatch_country", "geoMismatchCountry"))
 
 
 class AnomalyResponse(BaseModel):
     seller_id: str
+    sellerId: Optional[str] = None
     anomaly_score: float
+    anomalyScore: Optional[float] = None
     confidence: str
     is_anomaly: bool
+    isAnomaly: Optional[bool] = None
     risk_tier: str
+    riskTier: Optional[str] = None
     anomaly_flags: List[str]
+    anomalyFlags: Optional[List[str]] = None
     feature_contributions: Dict[str, float]
+    featureContributions: Optional[Dict[str, float]] = None
     evaluation_latency_ms: float
+    evaluationLatencyMs: Optional[float] = None
     model_version: str
     timestamp: str
 
@@ -150,13 +157,20 @@ def compute_anomaly(payload: SellerSignalPayload) -> Dict[str, Any]:
 
     return {
         "seller_id": payload.seller_id,
+        "sellerId": payload.seller_id,
         "anomaly_score": final_score,
+        "anomalyScore": final_score,
         "confidence": confidence,
         "is_anomaly": final_score >= 0.60,
+        "isAnomaly": final_score >= 0.60,
         "risk_tier": risk_tier,
+        "riskTier": risk_tier,
         "anomaly_flags": flags,
+        "anomalyFlags": flags,
         "feature_contributions": contributions,
+        "featureContributions": contributions,
         "evaluation_latency_ms": elapsed_ms,
+        "evaluationLatencyMs": elapsed_ms,
         "model_version": "2.0.0-isolationforest",
         "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat()
     }
