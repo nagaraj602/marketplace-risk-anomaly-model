@@ -91,3 +91,12 @@ curl -X POST http://localhost:8282/admin/toggle-health
 
 ### 4. Interactive API Documentation (Swagger)
 Open [http://localhost:8282/docs](http://localhost:8282/docs) in your browser.
+
+---
+
+## 🛡️ CI/CD & Jenkins Integration
+
+This ML model service utilizes Jenkins Multibranch Pipelines powered by [jenkins-sharedlibraries](https://github.com/nagaraj602/jenkins-sharedlibraries.git):
+- **Pull Request Quality Gate (`Jenkinsfile.pr`)**: Automatically triggered via GitHub webhook; executes unit tests (`python3 -m unittest discover tests`), SonarQube quality gate analysis (`sonar-server`), local Docker builds, and Trivy filesystem/image scans.
+- **Continuous Deployment (`Jenkinsfile`)**: Triggered on branch push/merge; builds production image, pushes to Amazon ECR, updates Helm values, and deploys to AWS EKS (`dev`, `uat`, or `prod`).
+- **Webhook Integration**: Configured with the **Multibranch Scan Webhook Trigger** plugin using trigger token `marketplace-risk-model-token`. See the [Complete Jenkins Integration Guide](https://github.com/nagaraj602/marketplace-risk-platform#%EF%B8%8F-jenkins-cicd-setup--multibranch-integration-guide).
