@@ -1,6 +1,6 @@
-# Multi-stage build for Python Anomaly ML Model
+# Multi-stage build for Python Anomaly ML Model (Python 3.15.2)
 # Build Stage
-FROM python:3.12-slim-bookworm AS builder
+FROM python:3.15.2-slim AS builder
 
 WORKDIR /app
 
@@ -12,7 +12,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir --user -r requirements.txt
 
 # Final Runtime Stage
-FROM python:3.12-slim-bookworm
+FROM python:3.15.2-slim
 
 WORKDIR /app
 
